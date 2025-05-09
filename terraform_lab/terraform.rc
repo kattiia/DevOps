@@ -1,0 +1,10 @@
+provider_installation {
+  network_mirror {
+    url     = "https://terraform-mirror.yandexcloud.net/"
+    include = ["yandex-cloud/yandex"]
+  }
+
+  direct {
+    exclude = ["yandex-cloud/yandex"]
+  }
+}

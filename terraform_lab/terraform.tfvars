@@ -1,0 +1,5 @@
+sa_key_file = "./authorized_key.json"
+cloud_id    = "b1gl57eocdkmdlrcdlb3"
+folder_id   = "b1gakom8uu9ff3uigs03"
+bucket_name = "terraform-s3-bucket"
+acl         = "public-read"
