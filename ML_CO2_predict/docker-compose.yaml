@@ -1,0 +1,71 @@
+version: '3.8'
+services:
+  api:
+    build:
+      context: .
+      dockerfile: api/Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_S3_ENDPOINT_URL=https://storage.yandexcloud.net
+      - AWS_BUCKET_NAME=${S3_BUCKET}
+      - MODEL_S3_KEY=models/co2_model.h5
+    depends_on:
+      - mlflow
+      - exporter
+
+  trainer:
+    build:
+      context: .
+      dockerfile: trainer/Dockerfile
+    environment:
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_S3_ENDPOINT_URL=https://storage.yandexcloud.net
+      - AWS_BUCKET_NAME=${S3_BUCKET}
+      - MODEL_S3_KEY=models/co2_model.h5
+    volumes:
+      - .:/app
+    depends_on:
+      - mlflow
+
+  mlflow:
+    build:
+      context: .
+      dockerfile: mlflow/Dockerfile
+    ports:
+      - "5000:5000"
+    environment:
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_S3_ENDPOINT_URL=https://storage.yandexcloud.net
+      - AWS_BUCKET_NAME=${S3_BUCKET}
+      - AWS_DEFAULT_REGION=ru-central1
+
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9091:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    depends_on:
+      - api
+      - exporter
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    depends_on:
+      - prometheus
+
+  exporter:
+    build:
+      context: .
+      dockerfile: monitoring/Dockerfile
+    ports:
+      - "9000:9000"

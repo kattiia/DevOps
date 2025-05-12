@@ -1,0 +1,38 @@
+stages:
+  - data
+  - train
+  - build
+
+variables:
+  DVC_REMOTE: "storage"
+
+before_script:
+  - pip install dvc[all] awscli
+  - dvc pull
+
+data:
+  stage: data
+  script:
+    - dvc pull
+  artifacts:
+    paths:
+      - data
+
+train:
+  stage: train
+  script:
+    - pip install -r requirements.txt mlflow
+    - dvc repro
+    - dvc push
+  artifacts:
+    paths:
+      - models
+
+build:
+  stage: build
+  script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"
+    - docker build -t co2-api:latest -f api/Dockerfile .
+    - docker build -t co2-trainer:latest -f trainer/Dockerfile .
+    - docker build -t co2-mlflow:latest -f mlflow/Dockerfile .
+    - docker build -t co2-exporter:latest -f monitoring/Dockerfile .

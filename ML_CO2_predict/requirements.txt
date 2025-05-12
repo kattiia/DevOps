@@ -1,0 +1,13 @@
+fastapi
+uvicorn
+mlflow
+dvc[s3]
+boto3
+tensorflow
+pandas
+numpy
+scikit-learn
+PyYAML
+prometheus_client
+requests
+keras

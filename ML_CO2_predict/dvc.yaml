@@ -1,0 +1,35 @@
+stages:
+  get_data:
+    cmd: python scripts/get_data.py
+    outs:
+      - data/raw/co2_mlo.csv
+
+  prepare:
+    cmd: python scripts/prepare_data.py
+    deps:
+      - data/raw/co2_mlo.csv
+      - config.yaml
+    outs:
+      - data/processed/X_train.npy
+      - data/processed/X_test.npy
+      - data/processed/y_train.npy
+      - data/processed/y_test.npy
+    params:
+      - model.sequence_length
+
+  train:
+    cmd: python trainer/train.py
+    deps:
+      - data/processed/X_train.npy
+      - data/processed/X_test.npy
+      - data/processed/y_train.npy
+      - data/processed/y_test.npy
+      - config.yaml
+    outs:
+      - models/co2_model.h5
+    params:
+      - model.hidden_units
+      - model.dropout
+      - model.epochs
+      - model.batch_size
+      - model.learning_rate

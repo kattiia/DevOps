@@ -1,0 +1,14 @@
+data:
+  raw_data_s3: "s3://###########/data/raw/co2_mlo.csv"
+  bucket_name: "#################"
+  model_key: "models/co2_model.h5"
+model:
+  sequence_length: 12
+  hidden_units: 100
+  dropout: 0.2
+  epochs: 100
+  batch_size: 16
+  learning_rate: 0.001
+mlflow:
+  tracking_uri: "http://mlflow:5000"
+  experiment_name: "co2_prediction"

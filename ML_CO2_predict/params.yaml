@@ -1,0 +1,7 @@
+model:
+  sequence_length: 12
+  hidden_units: 100
+  dropout: 0.2
+  epochs: 100
+  batch_size: 16
+  learning_rate: 0.001
